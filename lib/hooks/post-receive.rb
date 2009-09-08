@@ -40,9 +40,6 @@ if oldrev == null_ref
     FileUtils.cp example, config if example
   end
 else
-  # run the post-reset hook
-  log = ">>log/deploy.log"
-  command = [%(echo "==== $(date) ====" #{log})]
-  command << %(nohup .git/hooks/post-reset #{oldrev} #{newrev} 2>&1 #{log} &)
-  system command.join(' && ')
+  File.open('log/deploy.log', 'a') { |log| log.puts "==== #{Time.now} ====" }
+  system %(nohup .git/hooks/post-reset #{oldrev} #{newrev} 2>&1 >>log/deploy.log &)
 end
