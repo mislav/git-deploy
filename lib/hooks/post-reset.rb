@@ -17,6 +17,7 @@ modified_files = %w(A C M R).inject([]) { |files, bit| files.concat changes_hash
 added_files = changes_hash['A'] # added
 deleted_files = changes_hash['D'] # deleted
 changed_files = modified_files + deleted_files # all
+puts "files changed: #{changed_files.size}"
 
 class Array
   # scans the list of files to see if any of them are under the given path
@@ -43,7 +44,7 @@ unless asset_dirs.empty?
   # clear cached assets (unversioned/ignored files)
   deleted_assets = `git ls-files -z --other -- #{asset_dirs.join(' ')} | xargs -0 rm -v`.split("\n")
   unless deleted_assets.empty?
-    puts "Cleared: #{deleted_assets.join(', ')}"
+    puts "cleared: #{deleted_assets.join(', ')}"
     cached_assets_cleared = true
   end
 end
