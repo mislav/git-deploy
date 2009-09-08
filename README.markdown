@@ -81,6 +81,8 @@ Finally, these are the conditions that dictate an app restart:
 2. the database has migrated;
 3. one or more files/submodules under "app", "config", "lib", "public", or "vendor" changed.
 
+It's worth remembering that "post-reset" is done asynchronously from your push operation. This is because migrating the database and updating submodules might take a long time and we don't want to wait for all that while we're doing a git push. But, this means that when the push is done, the server has not yet restarted. You might need to wait a few seconds or a minute, depending on what you pushed.
+
 
 In the future
 -------------
