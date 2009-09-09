@@ -8,13 +8,13 @@ changes = `git diff #{oldrev} #{newrev} --diff-filter=ACDMR --name-status`.split
 
 # make a hash of files that changed and how they changed
 changes_hash = changes.inject(Hash.new { |h, k| h[k] = [] }) do |hash, line|
-  modifier, filename = line.split(/\d+/, 2)
+  modifier, filename = line.split("\t", 2)
   hash[modifier] << filename
   hash
 end
 
 # create an array of files added, copied, modified or renamed
-modified_files = %w(A C M R).inject([]) { |files, bit| files.concat changes_hash(bit) }
+modified_files = %w(A C M R).inject([]) { |files, bit| files.concat changes_hash[bit] }
 added_files = changes_hash['A'] # added
 deleted_files = changes_hash['D'] # deleted
 changed_files = modified_files + deleted_files # all
