@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 RAILS_ENV = 'production'
 oldrev, newrev = ARGV
+$stdout.sync = true
 
 # get a list of files that changed
 changes = `git diff #{oldrev} #{newrev} --diff-filter=ACDMR --name-status`.split("\n")
@@ -63,5 +64,6 @@ system %(git submodule update --init)
 if cached_assets_cleared or new_migrations or changed_files.any_in_dir?(%w(app config lib public vendor))
   require 'fileutils'
   # tell Passenger to restart this app
-  FileUtils.touch 'tmp/restart.txt', :verbose => true
+  FileUtils.touch 'tmp/restart.txt'
+  puts "restarting Passenger app"
 end

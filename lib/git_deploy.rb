@@ -71,7 +71,7 @@ Capistrano::Configuration.instance(true).load do
 
       top.upload "#{dir}/post-receive.rb", "#{remote_dir}/post-receive"
       top.upload "#{dir}/post-reset.rb", "#{remote_dir}/post-reset"
-      run "chmod +x #{remote_dir}/*"
+      run "chmod +x #{remote_dir}/post-receive #{remote_dir}/post-reset"
     end
 
     desc "Restarts your Passenger application."
