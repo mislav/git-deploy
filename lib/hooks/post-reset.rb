@@ -55,10 +55,14 @@ if new_migrations = added_files.any_in_dir?('db/migrate')
   system %(rake db:migrate RAILS_ENV=#{RAILS_ENV})
 end
 
-# sync submodule remote urls in case of changes
-system %(git submodule sync) if modified_files.include?('.gitmodules')
-# initialize new & update existing submodules
-system %(git submodule update --init)
+if modified_files.include?('.gitmodules')
+  # sync submodule remote urls in case of changes
+  system %(git submodule sync)
+  # initialize new submodules
+  system %(git submodule init)
+end
+# update existing submodules
+system %(git submodule update)
 
 # determine if app restart is needed
 if cached_assets_cleared or new_migrations or changed_files.any_in_dir?(%w(app config lib public vendor))
