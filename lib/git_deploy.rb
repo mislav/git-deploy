@@ -57,7 +57,6 @@ Capistrano::Configuration.instance(true).load do
       command << "chmod g+w ."
       command << "git init"
       command << "echo 'ref: refs/heads/#{branch}' > .git/HEAD" unless branch == 'master'
-      command << "rm .git/hooks/*"
       command << "git config receive.denyCurrentBranch ignore"
       run command.join(' && ')
 
