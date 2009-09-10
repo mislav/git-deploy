@@ -57,7 +57,7 @@ Capistrano::Configuration.instance(true).load do
       command << "cd #{deploy_to}"
       command << "chmod g+w ."
       command << "git init #{fetch(:group_writeable) ? '--shared' : ''}"
-      command << "echo 'ref: refs/heads/#{branch}' > .git/HEAD" unless branch == 'master'
+      command << "sed -i'' -e 's/master/#{branch}/' .git/HEAD" unless branch == 'master'
       command << "git config --bool receive.denyNonFastForwards false" if fetch(:group_writeable)
       command << "git config receive.denyCurrentBranch ignore"
       run command.join(' && ')
