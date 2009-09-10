@@ -17,6 +17,7 @@ Capistrano::Configuration.instance(true).load do
   _cset(:remote_host) { remote_url.split(':', 2).first }
   _cset(:deploy_to)   { exists?(:repository) ? "/u/apps/#{application}" : remote_url.split(':', 2).last }
   _cset(:run_method)  { fetch(:use_sudo, true) ? :sudo : :run }
+  _cset :group_writeable, false
 
   # If :run_method is :sudo (or :use_sudo is true), this executes the given command
   # via +sudo+. Otherwise is uses +run+. If :as is given as a key, it will be
@@ -55,8 +56,9 @@ Capistrano::Configuration.instance(true).load do
       command << "#{try_sudo} chown $USER #{deploy_to}" if fetch(:run_method, :sudo) == :sudo
       command << "cd #{deploy_to}"
       command << "chmod g+w ."
-      command << "git init"
+      command << "git init #{fetch(:group_writeable) ? '--shared' : ''}"
       command << "echo 'ref: refs/heads/#{branch}' > .git/HEAD" unless branch == 'master'
+      command << "git config --bool receive.denyNonFastForwards false" if fetch(:group_writeable)
       command << "git config receive.denyCurrentBranch ignore"
       run command.join(' && ')
 
