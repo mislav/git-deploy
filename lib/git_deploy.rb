@@ -8,16 +8,18 @@ Capistrano::Configuration.instance(true).load do
   end
 
   _cset(:application) { abort "Please specify the name of your application, set :application, 'foo'" }
-  _cset :remote,   "origin"
-  _cset :branch,   "master"
-  _cset(:revision) { branch }
-  _cset(:source)   { Capistrano::Deploy::SCM::Git.new(self) }
+  _cset :remote, "origin"
+  _cset :branch, "master"
 
-  _cset(:remote_url)  { `#{ source.local.scm('config', "remote.#{remote}.url") }`.chomp }
-  _cset(:remote_host) { remote_url.split(':', 2).first }
-  _cset(:deploy_to)   { exists?(:repository) ? "/u/apps/#{application}" : remote_url.split(':', 2).last }
+  _cset(:repository)  { `#{ source.local.scm('config', "remote.#{remote}.url") }`.chomp }
+  _cset(:remote_host) { repository.split(':', 2).first }
+  _cset(:deploy_to)   { repository.split(':', 2).last }
   _cset(:run_method)  { fetch(:use_sudo, true) ? :sudo : :run }
   _cset :group_writeable, false
+
+  _cset(:current_branch) { File.read('.git/HEAD').chomp.split(' refs/heads/').last }
+  _cset(:revision) { branch }
+  _cset(:source)   { Capistrano::Deploy::SCM::Git.new(self) }
 
   # If :run_method is :sudo (or :use_sudo is true), this executes the given command
   # via +sudo+. Otherwise is uses +run+. If :as is given as a key, it will be
