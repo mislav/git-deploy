@@ -7,6 +7,8 @@ Let's set up a straightforward, [Heroku][]-style, push-based deployment, shall w
 
 Assumptions are that you are using git for your Rails app and Passenger on the server. For now, we're going to deploy on a single host.
 
+To get started, install the "git-deploy" gem from Gemcutter.org.
+
 
 Considerations
 --------------
