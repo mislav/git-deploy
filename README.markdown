@@ -1,11 +1,17 @@
 Capistrano strategy for smart git deployment
 ============================================
 
-Let's set up a straightforward, [Heroku][]-style, push-based deployment, shall we? The goal is that our deployments look like this:
+Let's set up a straightforward, [Heroku][]-style, push-based deployment, shall we? The goal is that our deployment looks like this:
 
     $ git push origin production
 
 Assumptions are that you are using git for your Rails app and Passenger on the server. For now, we're going to deploy on a single host.
+
+
+Considerations
+--------------
+
+This is not "yet another Capistrano strategy". Capistrano is only used for setup, after which it's all git hooks (see detailed description in "Deployment"). This actually replaces the default Capistrano recipe (which is not loaded) with only a basic set of tasks. If you have more advanced deployment (multiple hosts, many "after deploy" hooks) then this library cannot suit your needs at present.
 
 
 Setup steps
@@ -94,7 +100,7 @@ Next steps for this library are:
 * Support for deployment on multiple hosts. This is a slightly different strategy based on git pull instead of push; something in-between regular "remote cache" strategy and the aforementioned
 * Better configurability
 * Steps forward to supporting more existing 3rd-party Capistrano tasks, like that of the EngineYard gem
-* Support for multiple environments on the same server: production, staging, etc.
+* Support for multiple environments on the same server (production, staging, continuous integration, etc.) sharing the same git repo, so you don't have to push same objects twice
 * Automatic submodule conflict resolving
 
 
