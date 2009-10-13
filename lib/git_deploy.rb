@@ -11,6 +11,7 @@ Capistrano::Configuration.instance(true).load do
   _cset :remote, "origin"
   _cset :branch, "master"
 
+  _cset(:multiple_hosts) { roles.values.map{ |v| v.servers}.flatten.uniq.size > 1 }
   _cset(:repository)  { `#{ source.local.scm('config', "remote.#{remote}.url") }`.chomp }
   _cset(:remote_host) { repository.split(':', 2).first }
   _cset(:deploy_to)   { repository.split(':', 2).last }
@@ -45,7 +46,16 @@ Capistrano::Configuration.instance(true).load do
   namespace :deploy do
     desc "Deploys your project."
     task :default do
-      push
+      if multiple_hosts
+        command = ["cd #{deploy_to}"]
+        command << source.scm('fetch', remote)
+        command << source.scm('reset', '--hard', "origin/#{branch}")
+        command << ".git/hooks/post-reset `cat .git/ORIG_HEAD` HEAD"
+        
+        run command.join(' && ')
+      else
+        push
+      end
     end
 
     task :push do
