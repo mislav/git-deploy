@@ -33,10 +33,10 @@ Capistrano::Configuration.instance(true).load do
     raise ArgumentError, "too many arguments" if args.any?
 
     as = options.fetch(:as, fetch(:admin_runner, nil))
-    via = fetch(:run_method, :sudo)
+    
     if command
-      invoke_command(command, :via => via, :as => as)
-    elsif via == :sudo
+      invoke_command(command, :via => run_method, :as => as)
+    elsif :sudo == run_method
       sudo(:as => as)
     else
       ""
@@ -64,16 +64,18 @@ Capistrano::Configuration.instance(true).load do
 
     desc "Prepares servers for deployment."
     task :setup do
+      shared = fetch(:group_writeable)
+      
       command = ["#{try_sudo} mkdir -p #{deploy_to}"]
-      command << "#{try_sudo} chown $USER #{deploy_to}" if fetch(:run_method, :sudo) == :sudo
+      command << "#{try_sudo} chown $USER #{deploy_to}" if :sudo == run_method
       command << "cd #{deploy_to}"
-      command << "chmod g+w ."
-      command << "git init #{fetch(:group_writeable) ? '--shared' : ''}"
+      command << "chmod g+w ." if shared
+      command << "git init #{shared ? '--shared' : ''}"
       command << "sed -i'' -e 's/master/#{branch}/' .git/HEAD" unless branch == 'master'
-      command << "git config --bool receive.denyNonFastForwards false" if fetch(:group_writeable)
+      command << "git config --bool receive.denyNonFastForwards false" if shared
       command << "git config receive.denyCurrentBranch ignore"
       run command.join(' && ')
-
+      
       install_hooks
       push
     end
