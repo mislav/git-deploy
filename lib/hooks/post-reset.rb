@@ -43,11 +43,8 @@ end
 
 unless asset_dirs.empty?
   # clear cached assets (unversioned/ignored files)
-  deleted_assets = `git ls-files -z --other -- #{asset_dirs.join(' ')} | xargs -0 rm -v`.split("\n")
-  unless deleted_assets.empty?
-    puts "cleared: #{deleted_assets.join(', ')}"
-    cached_assets_cleared = true
-  end
+  system %(git clean -x -f -- #{asset_dirs.join(' ')})
+  cached_assets_cleared = true
 end
 
 # run migrations when new ones added
@@ -63,6 +60,9 @@ if modified_files.include?('.gitmodules')
 end
 # update existing submodules
 system %(git submodule update)
+
+# clean unversioned files from vendor (e.g. old submodules)
+system %(git clean -d -f vendor)
 
 # determine if app restart is needed
 if cached_assets_cleared or new_migrations or changed_files.any_in_dir?(%w(app config lib public vendor))
