@@ -91,5 +91,22 @@ Capistrano::Configuration.instance(true).load do
     task :restart, :roles => :app do
       run "touch #{deploy_to}/tmp/restart.txt"
     end
+
+    desc <<-DESC
+      Copy files to the currently deployed version. Use a comma-separated \
+      list in FILES to specify which files to upload.
+
+      Note that unversioned files on your server are likely to be \
+      overwritten by the next push. Always persist your changes by committing.
+
+        $ cap deploy:upload FILES=templates,controller.rb
+        $ cap deploy:upload FILES='config/apache/*.conf'
+    DESC
+    task :upload do
+      files = (ENV["FILES"] || "").split(",").map { |f| Dir[f.strip] }.flatten
+      abort "Please specify at least one file or directory to update (via the FILES environment variable)" if files.empty?
+
+      files.each { |file| top.upload(file, File.join(deploy_to, file)) }
+    end
   end
 end
