@@ -46,20 +46,27 @@ Capistrano::Configuration.instance(true).load do
   namespace :deploy do
     desc "Deploys your project."
     task :default do
-      if multiple_hosts
+      unless multiple_hosts
+        push
+      else
+        code
         command = ["cd #{deploy_to}"]
-        command << source.scm('fetch', remote)
-        command << source.scm('reset', '--hard', "origin/#{branch}")
-        command << ".git/hooks/post-reset `cat .git/ORIG_HEAD` HEAD"
+        command << ".git/hooks/post-reset `cat .git/ORIG_HEAD` HEAD 2>&1 | tee -a log/deploy.log"
         
         run command.join(' && ')
-      else
-        push
       end
     end
 
     task :push do
       system source.local.scm('push', remote, "#{revision}:#{branch}")
+    end
+
+    task :code do
+      command = ["cd #{deploy_to}"]
+      command << source.scm('fetch', remote, "+refs/heads/#{branch}:refs/remotes/origin/#{branch}")
+      command << source.scm('reset', '--hard', "origin/#{branch}")
+      
+      run command.join(' && ')
     end
 
     desc "Prepares servers for deployment."
