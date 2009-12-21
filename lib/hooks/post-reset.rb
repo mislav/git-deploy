@@ -98,6 +98,11 @@ end
 # update existing submodules
 system %(git submodule update)
 
+if changed_files.include?('Gemfile')
+  # update bundled gems if manifest file has changed
+  system %(gem bundle --cached)
+end
+
 # clean unversioned files from vendor (e.g. old submodules)
 system %(git clean -d -f vendor)
 
