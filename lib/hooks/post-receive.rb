@@ -8,9 +8,9 @@ if ENV['GIT_DIR'] == '.'
 end
 
 # find out the current branch
-head = File.read('.git/HEAD').chomp
+head = `git symbolic-ref HEAD`.chomp
 # abort if we're on a detached head
-exit unless head.sub!('ref: ', '')
+exit unless $?.success?
 
 oldrev = newrev = nil
 null_ref = '0' * 40
