@@ -68,12 +68,12 @@ end
 
 # run migrations when new ones added
 if new_migrations = added_files.any_in_dir?('db/migrate')
-  system %(rake db:migrate RAILS_ENV=#{RAILS_ENV})
+  system %(umask 002 && rake db:migrate RAILS_ENV=#{RAILS_ENV})
 end
 
 if modified_files.include?('.gitmodules')
   # initialize new submodules
-  system %(git submodule init)
+  system %(umask 002 && git submodule init)
   # sync submodule remote urls in case of changes
   config = parse_configuration('.gitmodules')
 
@@ -96,11 +96,11 @@ if modified_files.include?('.gitmodules')
   end
 end
 # update existing submodules
-system %(git submodule update)
+system %(umask 002 && git submodule update)
 
 if changed_files.include?('Gemfile')
   # update bundled gems if manifest file has changed
-  system %(gem bundle --cached)
+  system %(umask 002 && gem bundle --cached)
 end
 
 # clean unversioned files from vendor (e.g. old submodules)

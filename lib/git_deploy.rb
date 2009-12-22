@@ -75,8 +75,8 @@ Capistrano::Configuration.instance(true).load do
       
       command = ["#{try_sudo} mkdir -p #{deploy_to}"]
       command << "#{try_sudo} chown $USER #{deploy_to}" if :sudo == run_method
+      command << "chmod g+ws #{deploy_to}" if shared
       command << "cd #{deploy_to}"
-      command << "chmod g+w ." if shared
       command << "git init #{shared ? '--shared' : ''}"
       command << "sed -i'' -e 's/master/#{branch}/' .git/HEAD" unless branch == 'master'
       command << "git config --bool receive.denyNonFastForwards false" if shared
