@@ -7,6 +7,10 @@ if ENV['GIT_DIR'] == '.'
   ENV['GIT_DIR'] = '.git'
 end
 
+cmd = %(bash -c "[ -f /etc/profile ] && source /etc/profile; echo $PATH")
+envpath = IO.popen(cmd, 'r') { |io| io.read.chomp }
+ENV['PATH'] = envpath
+
 # find out the current branch
 head = `git symbolic-ref HEAD`.chomp
 # abort if we're on a detached head
