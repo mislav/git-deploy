@@ -107,7 +107,8 @@ end
 system %(git clean -d -f vendor)
 
 # determine if app restart is needed
-if cached_assets_cleared or new_migrations or changed_files.any_in_dir?(%w(app config lib public vendor))
+if cached_assets_cleared or new_migrations or !File.exists?('config/environment.rb') or
+    changed_files.any_in_dir?(%w(app config lib public vendor))
   require 'fileutils'
   # tell Passenger to restart this app
   FileUtils.touch 'tmp/restart.txt'
