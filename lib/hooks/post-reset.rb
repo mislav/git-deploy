@@ -100,7 +100,7 @@ system %(umask 002 && git submodule update)
 
 if changed_files.include?('Gemfile')
   # update bundled gems if manifest file has changed
-  system %(umask 002 && bundle lock && bundle install)
+  system %(umask 002 && bundle install)
 end
 
 # clean unversioned files from vendor (e.g. old submodules)
