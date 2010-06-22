@@ -66,6 +66,11 @@ unless asset_dirs.empty?
   cached_assets_cleared = true
 end
 
+if changed_files.include?('Gemfile')
+  # update bundled gems if manifest file has changed
+  system %(umask 002 && bundle install)
+end
+
 # run migrations when new ones added
 if new_migrations = added_files.any_in_dir?('db/migrate')
   system %(umask 002 && rake db:migrate RAILS_ENV=#{RAILS_ENV})
@@ -97,11 +102,6 @@ if modified_files.include?('.gitmodules')
 end
 # update existing submodules
 system %(umask 002 && git submodule update)
-
-if changed_files.include?('Gemfile')
-  # update bundled gems if manifest file has changed
-  system %(umask 002 && bundle install)
-end
 
 # clean unversioned files from vendor (e.g. old submodules)
 system %(git clean -d -f vendor)
