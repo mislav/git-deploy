@@ -1,6 +1,6 @@
 Gem::Specification.new do |gem|
   gem.name    = 'git-deploy'
-  gem.version = '0.4.0'
+  gem.version = '0.4.1'
   gem.date    = Date.today.to_s
   
   gem.add_dependency 'capistrano', '~> 2.5.9'
