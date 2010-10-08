@@ -66,9 +66,9 @@ unless asset_dirs.empty?
   cached_assets_cleared = true
 end
 
-if changed_files.include?('Gemfile')
+if changed_files.include?('Gemfile') || changed_files.include?('Gemfile.lock')
   # update bundled gems if manifest file has changed
-  system %(umask 002 && bundle install)
+  system %(umask 002 && bundle install --deployment)
 end
 
 # run migrations when new ones added
