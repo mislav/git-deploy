@@ -78,10 +78,11 @@ Thus, on first push your server automatically:
 On every subsequent deploy, the "post-reset" script analyzes changes and:
 
 1. clears cached css and javascript assets if any versioned files under "public/stylesheets" and "public/javascripts" have changed, respectively;
-2. runs "rake db:migrate" if new migrations have been added;
-3. sync submodule urls if ".gitmodules" file has changed;
-4. initialize and update submodules;
-5. touches "tmp/restart.txt" if app restart is needed.
+2. runs "bundle install --deployment" if Gemfile or Gemfile.lock have been changed
+3. runs "rake db:migrate" if new migrations have been added;
+4. sync submodule urls if ".gitmodules" file has changed;
+5. initialize and update submodules;
+6. touches "tmp/restart.txt" if app restart is needed.
 
 Finally, these are the conditions that dictate an app restart:
 
