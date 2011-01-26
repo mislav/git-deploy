@@ -104,6 +104,8 @@ end
 system %(umask 002 && git submodule update)
 
 # clean unversioned files from vendor (e.g. old submodules)
+# Note: Make sure 'vendor/bundle*' is in your .gitignore, or this will wipe the
+#       vendor bundle directory as well.
 system %(git clean -d -f vendor)
 
 # determine if app restart is needed
