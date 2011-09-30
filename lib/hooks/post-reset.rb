@@ -71,9 +71,11 @@ if changed_files.include?('Gemfile') || changed_files.include?('Gemfile.lock')
   system %(umask 002 && bundle install --deployment)
 end
 
+rake_cmd = File.exists?('Gemfile') ? 'bundle exec rake' : 'rake'
+
 # run migrations when new ones added
 if new_migrations = added_files.any_in_dir?('db/migrate')
-  system %(umask 002 && rake db:migrate RAILS_ENV=#{RAILS_ENV})
+  system %(umask 002 && #{rake_cmd} db:migrate RAILS_ENV=#{RAILS_ENV})
 end
 
 if modified_files.include?('.gitmodules')
