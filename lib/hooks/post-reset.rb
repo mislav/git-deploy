@@ -52,32 +52,6 @@ deleted_files = changes_hash['D'] # deleted
 changed_files = modified_files + deleted_files # all
 puts "files changed: #{changed_files.size}"
 
-cached_assets_cleared = false
-
-# detect modified asset dirs
-asset_dirs = %w(public/stylesheets public/javascripts).select do |dir|
-  # did any on the assets under this dir change?
-  changed_files.any_in_dir?(dir)
-end
-
-unless asset_dirs.empty?
-  # clear cached assets (unversioned/ignored files)
-  system %(git clean -x -f -- #{asset_dirs.join(' ')})
-  cached_assets_cleared = true
-end
-
-if changed_files.include?('Gemfile') || changed_files.include?('Gemfile.lock')
-  # update bundled gems if manifest file has changed
-  system %(umask 002 && bundle install --deployment)
-end
-
-rake_cmd = File.exists?('Gemfile') ? 'bundle exec rake' : 'rake'
-
-# run migrations when new ones added
-if new_migrations = added_files.any_in_dir?('db/migrate')
-  system %(umask 002 && #{rake_cmd} db:migrate RAILS_ENV=#{RAILS_ENV})
-end
-
 if modified_files.include?('.gitmodules')
   # initialize new submodules
   system %(umask 002 && git submodule init)
@@ -104,6 +78,32 @@ if modified_files.include?('.gitmodules')
 end
 # update existing submodules
 system %(umask 002 && git submodule update)
+
+cached_assets_cleared = false
+
+# detect modified asset dirs
+asset_dirs = %w(public/stylesheets public/javascripts).select do |dir|
+  # did any on the assets under this dir change?
+  changed_files.any_in_dir?(dir)
+end
+
+unless asset_dirs.empty?
+  # clear cached assets (unversioned/ignored files)
+  system %(git clean -x -f -- #{asset_dirs.join(' ')})
+  cached_assets_cleared = true
+end
+
+if changed_files.include?('Gemfile') || changed_files.include?('Gemfile.lock')
+  # update bundled gems if manifest file has changed
+  system %(umask 002 && bundle install --deployment)
+end
+
+rake_cmd = File.exists?('Gemfile') ? 'bundle exec rake' : 'rake'
+
+# run migrations when new ones added
+if new_migrations = added_files.any_in_dir?('db/migrate')
+  system %(umask 002 && #{rake_cmd} db:migrate RAILS_ENV=#{RAILS_ENV})
+end
 
 # clean unversioned files from vendor/plugins (e.g. old submodules)
 system %(git clean -d -f vendor/plugins)
