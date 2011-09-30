@@ -105,10 +105,8 @@ end
 # update existing submodules
 system %(umask 002 && git submodule update)
 
-# clean unversioned files from vendor (e.g. old submodules)
-# Note: Make sure 'vendor/bundle*' is in your .gitignore, or this will wipe the
-#       vendor bundle directory as well.
-system %(git clean -d -f vendor)
+# clean unversioned files from vendor/plugins (e.g. old submodules)
+system %(git clean -d -f vendor/plugins)
 
 # determine if app restart is needed
 if cached_assets_cleared or new_migrations or !File.exists?('config/environment.rb') or
