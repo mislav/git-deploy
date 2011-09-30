@@ -1,110 +1,73 @@
-Capistrano strategy for smart git deployment
-============================================
+Easy git deployment
+===================
 
-Let's set up a straightforward, [Heroku][]-style, push-based deployment, shall we? The goal is that our deployment looks like this:
+Straightforward, [Heroku][]-style, push-based deployment. Your deploys will look like this:
 
-    $ git push origin production
+    $ git push production master
 
-Assumptions are that you are using git for your Rails app and Passenger on the server. For now, we're going to deploy on a single host.
+Assumptions are that you are deploying to a single host. Also, that you have Phusion Passenger on the server running your application.
 
-To get started, install the "git-deploy" gem from Gemcutter.org.
-
-
-Considerations
---------------
-
-This is not "yet another Capistrano strategy". Capistrano is only used for setup, after which it's all git hooks (see detailed description in "Deployment"). This actually replaces the default Capistrano recipe (which is not loaded) with only a basic set of tasks. If you have more advanced deployment (multiple hosts, many "after deploy" hooks) then this library cannot suit your needs at present.
+To get started, install the "git-deploy" gem.
 
 
 Setup steps
 -----------
 
-1.  Create a git remote for where you'll push the code on your server. The name of this remote in the examples is "origin", but it can be whatever you wish ("online", "website", or other).
+1.  Create a git remote for where you'll push the code on your server. The name of this remote in the examples is "production", but it can be whatever you wish ("online", "website", or other).
     
-        $ git remote add origin user@example.com:/path/to/myapp
+        $ git remote add production user@example.com:/path/to/myapp
     
     The "/path/to/myapp" is the directory where your code will reside. It doesn't have to exist; it will be created for you during this setup.
 
-2.  Create/overwrite the following files in your project:
+2.  Run the setup task:
     
-    **config/deploy.rb** (entire file):
+        $ git deploy setup -r production
     
-        # set to the name of git remote you intend to deploy to
-        set :remote, "origin"
-        # specify the deployment branch
-        set :branch, "master"
-        # sudo will only be used to create the deployment directory
-        set :use_sudo, true
-        # the remote host is read automatically from your git remote specification
-        server remote_host, :app, :web, :db, :primary => true
-    
-    **Capfile**:
-    
-        require 'git_deploy'
-        load 'config/deploy'
-    
-    Test it by running `cap -T`. You should see several deploy tasks listed.
+    This will initialize the remote git repository in the target directory ("/path/to/myapp" in the above example), install the remote git hooks and push the master branch to the server.
 
-3.  Run the setup task:
-    
-        $ cap deploy:setup
-    
-    This will initialize a git repository in the target directory, install the push hook and push the branch you specified to the server.
-
-4.  Login to your server to perform necessary one-time administrative operations. This might include:
+3.  Login to your server and manually perform necessary one-time administrative operations. This might include:
     * set up the Apache/nginx virtual host for this application;
-    * check out the branch which you will push production code into (often this is "production");
-    * check your config/database.yml and create or import the production database.
+    * check your "config/database.yml" and create the production database.
 
 
 Deployment
 ----------
 
-After you've set everything up, visiting "http://example.com" in your browser should show your app up and running. Subsequent deployments are done simply by pushing to the branch that is currently checked out on our server (see step 4.). The branch is by default "master", but it's suggested to have production code in another branch like "production" or other. This, of course, depends on your git workflow.
+After you've set everything up, visiting "http://example.com" in your browser should show your app up and running.
 
-We've reached our goal; our deployment now looks like:
+Now, subsequent deployments are done simply by pushing to the branch that is currently checked out on the remote:
 
-    $ git push origin production
+    $ git push production master
 
-In fact, running "cap deploy" does exactly this. So what does it do?
+Deployments are logged to "log/deploy.log" in your application.
 
-The "deploy:setup" task installed a couple of hooks in the remote git repository: "post-receive" and "post-reset". The former is a git hook which is invoked after every push to your server, while the latter is a *custom* hook that's called asynchronously by "post-receive" when we updated the deployment branch. This is how your working copy on the server is kept up-to-date.
-
-Thus, on first push your server automatically:
+On first push your server automatically:
 
 1. creates the "log" and "tmp" directories;
-2. copies "config/database.example.yml" or "config/database.yml.example" to "config/database.yml".
+2. copies "config/database.example.yml" to "config/database.yml".
 
 On every subsequent deploy, the "post-reset" script analyzes changes and:
 
-1. clears cached css and javascript assets if any versioned files under "public/stylesheets" and "public/javascripts" have changed, respectively;
-2. runs "bundle install --deployment" if Gemfile or Gemfile.lock have been changed
-3. runs "rake db:migrate" if new migrations have been added;
 4. sync submodule urls if ".gitmodules" file has changed;
 5. initialize and update submodules;
-6. touches "tmp/restart.txt" if app restart is needed.
+1. clears cached CSS/JS assets if any versioned files under "public/stylesheets" and "public/javascripts" have changed;
+2. runs `bundle install --deployment` if Gemfile or Gemfile.lock have been changed
+3. runs `rake db:migrate` if new migrations have been added;
+6. `touch tmp/restart.txt` if app restart is needed.
 
-Finally, these are the conditions that dictate an app restart:
+Finally, these are the conditions that trigger the app restart:
 
-1. css/javascript assets have been cleared;
-2. the database has migrated;
-3. one or more files/submodules under "app", "config", "lib", "public", or "vendor" changed.
-
-The output of "post-reset" is logged to "log/deploy.log" in your application.
-
-It's worth remembering that "post-reset" is done asynchronously from your push operation. This is because migrating the database and updating submodules might take a long time and we don't want to wait for all that while we're doing a git push. But, this means that when the push is done, the server has not yet restarted. You might need to wait a few seconds or a minute, depending on what you pushed.
-
-
-In the future
--------------
-
-Next steps for this library are:
-
-* Support for deployment on multiple hosts. This is a slightly different strategy based on git pull instead of push; something in-between regular "remote cache" strategy and the aforementioned
-* Better configurability
-* Steps forward to supporting more existing 3rd-party Capistrano tasks, like that of the EngineYard gem
-* Support for multiple environments on the same server (production, staging, continuous integration, etc.) sharing the same git repo, so you don't have to push same objects twice
-* Automatic submodule conflict resolving
+1. some CSS/JS assets have been cleared;
+2. the database schema has been migrated;
+3. one or more files/submodules under "app", "config", "lib", "public", or "vendor" have changed.
 
 
-[heroku]: http://heroku.com/
+How it works
+------------
+
+The "setup" task installed a couple of hooks in the remote git repository: "post-receive" and "post-reset". The former is a git hook which is invoked after every push to your server, while the latter is a *custom* hook that's called asynchronously by "post-receive" when we updated the deployment branch. This is how your working copy on the server is kept up-to-date.
+
+It's worth knowing that "post-reset" is done **asynchronously from your push operation**. This is because migrating the database and updating submodules might take a long time and we don't want to wait for all that while we're doing a git push. But, this means that when the push is done, the server has *not yet restarted*. You might need to wait a few seconds or a minute.
+
+
+  [heroku]: http://heroku.com/
