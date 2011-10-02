@@ -49,6 +49,9 @@ if oldrev == null_ref
     example = ['config/database.example.yml', config + '.example'].find { |f| File.exists? f }
     FileUtils.cp example, config if example
   end
+  
+  # init submodules
+  system %(umask 002 && git submodule update --init | tee -a #{logfile})
 else
   # log timestamp
   File.open(logfile, 'a') { |log| log.puts "==== #{Time.now} ====" }
