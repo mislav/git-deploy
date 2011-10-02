@@ -44,6 +44,11 @@ class GitDeploy < Thor
     run "touch #{deploy_to}/tmp/restart.txt"
   end
 
+  desc "log [n=20]", "Shows the last part of the deploy log on the server"
+  def log(n = 20)
+    run "tail -n#{n} #{deploy_to}/log/deploy.log"
+  end
+
   desc "upload <files>", "Copy local files to the remote app"
   def upload(*files)
     files = files.map { |f| Dir[f.strip] }.flatten
