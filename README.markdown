@@ -5,9 +5,19 @@ Straightforward, [Heroku][]-style, push-based deployment. Your deploys will look
 
     $ git push production master
 
-Assumptions are that you are deploying to a single host. Also, that you have Phusion Passenger on the server running your application.
-
 To get started, install the "git-deploy" gem.
+
+    $ gem install git-deploy
+
+
+What application frameworks/languages are supported?
+----------------------------------------------------
+
+Regardless of the fact that this tool is mostly written in Ruby, git-deploy can be useful for any kind of code that needs deploying on a remote server. The default scripts are suited for Ruby web apps, but can be edited to accommodate other frameworks.
+
+Your deployment is customized with per-project callback scripts which can be written in any language.
+
+The assumption is that you're deploying to a single host to which you connect over SSH using public/private key authentication.
 
 
 Setup steps
@@ -23,7 +33,17 @@ Setup steps
     
         $ git deploy setup -r production
     
-    This will initialize the remote git repository in the target directory ("/path/to/myapp" in the above example), install the remote git hooks and push the master branch to the server.
+    This will initialize the remote git repository in the target directory ("/path/to/myapp" in the above example) and install the remote git hooks.
+
+3.  Run the init task:
+    
+        $ git deploy init
+    
+    This generates default deploy callback scripts in the "deploy/" directory. You must check them in version control. They are going to be executed on the server on each deploy.
+
+4.  Push the code.
+
+        $ git push production master
 
 3.  Login to your server and manually perform necessary one-time administrative operations. This might include:
     * set up the Apache/nginx virtual host for this application;
@@ -33,41 +53,34 @@ Setup steps
 Deployment
 ----------
 
-After you've set everything up, visiting "http://example.com" in your browser should show your app up and running.
+If you've set your app correctly, visiting "http://example.com" in your browser should show it up and running.
 
 Now, subsequent deployments are done simply by pushing to the branch that is currently checked out on the remote:
 
     $ git push production master
 
+Because the deployments are done with git, not everyone on the team had to install git-deploy. Just the person who was doing the setup.
+
 Deployments are logged to "log/deploy.log" in your application.
 
-On first push your server automatically:
+On every deploy, the "deploy/after_push" script performs the following:
 
-1. creates the "log" and "tmp" directories;
-2. copies "config/database.example.yml" to "config/database.yml".
-
-On every subsequent deploy, the "post-reset" script analyzes changes and:
-
-4. sync submodule urls if ".gitmodules" file has changed;
-5. initialize and update submodules;
-1. clears cached CSS/JS assets if any versioned files under "public/stylesheets" and "public/javascripts" have changed;
-2. runs `bundle install --deployment` if Gemfile or Gemfile.lock have been changed
+1. updates git submodules (if there are any);
+2. runs `bundle install --deployment` if there is a Gemfile;
 3. runs `rake db:migrate` if new migrations have been added;
-6. `touch tmp/restart.txt` if app restart is needed.
+4. clears cached CSS/JS assets in "public/stylesheets" and "public/javascripts";
+5. restarts the web application.
 
-Finally, these are the conditions that trigger the app restart:
-
-1. some CSS/JS assets have been cleared;
-2. the database schema has been migrated;
-3. one or more files/submodules under "app", "config", "lib", "public", or "vendor" have changed.
-
+You can customize all of this by editing scripts in the "deploy/" directory of your app.
 
 How it works
 ------------
 
-The "setup" task installed a couple of hooks in the remote git repository: "post-receive" and "post-reset". The former is a git hook which is invoked after every push to your server, while the latter is a *custom* hook that's called asynchronously by "post-receive" when we updated the deployment branch. This is how your working copy on the server is kept up-to-date.
+The "setup" task installed a "post-receive" hook in the remote git repository. This is how your working copy on the server is kept up to date. This hook, after checking out latest code, asynchronously dispatches to "deploy/after_push" script in your application. This script executes on the server and also calls "deploy/before_restart", "restart", and "after_restart" callbacks if they are present.
 
-It's worth knowing that "post-reset" is done **asynchronously from your push operation**. This is because migrating the database and updating submodules might take a long time and we don't want to wait for all that while we're doing a git push. But, this means that when the push is done, the server has *not yet restarted*. You might need to wait a few seconds or a minute.
+These scripts are ordinary unix executable files. The ones which are generated for you are written in shell script and Ruby.
+
+It's worth remembering that "after_push" is done **asynchronously from your git push**. This is because migrating the database and updating submodules might take a long time and you don't want to wait for all that during a git push. But, this means that when the push is done, the server has *not yet restarted*. You might need to wait a few seconds or a minute.
 
 
   [heroku]: http://heroku.com/
