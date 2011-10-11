@@ -25,7 +25,7 @@ class GitDeploy < Thor
   def setup
     sudo = options.sudo? ? "#{sudo_cmd} " : ''
 
-    if run_test("test -x #{deploy_to}")
+    unless run_test("test -x #{deploy_to}")
       run ["#{sudo}mkdir -p #{deploy_to}"] do |cmd|
         cmd << "#{sudo}chown $USER #{deploy_to}" if options.sudo?
       end
