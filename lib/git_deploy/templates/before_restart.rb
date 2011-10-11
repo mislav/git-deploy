@@ -5,12 +5,13 @@ def run(cmd)
   exit($?.exitstatus) unless system "umask 002 && #{cmd}"
 end
 
-RAILS_ENV   = ENV['RAILS_ENV'] || 'production'
-use_bundler = File.file? 'Gemfile'
-rake_cmd    = use_bundler ? 'bundle exec rake' : 'rake'
+RAILS_ENV      = ENV['RAILS_ENV'] || 'production'
+use_bundler    = File.file? 'Gemfile'
+rake_cmd       = use_bundler ? 'bundle exec rake' : 'rake'
+BUNDLE_WITHOUT = ENV['BUNDLE_WITHOUT'] || 'development test' if use_bundler
 
 # update gem bundle
-run "bundle install --deployment" if use_bundler
+run "bundle install --deployment --without #{BUNDLE_WITHOUT}" if use_bundler
 
 if File.file? 'Rakefile'
   num_migrations = `git diff #{oldrev} #{newrev} --diff-filter=A --name-only`.split("\n").size
