@@ -9,8 +9,14 @@ RAILS_ENV   = ENV['RAILS_ENV'] || 'production'
 use_bundler = File.file? 'Gemfile'
 rake_cmd    = use_bundler ? 'bundle exec rake' : 'rake'
 
-# update gem bundle
-run "bundle install --deployment" if use_bundler
+if use_bundler
+  bundler_args = ['--deployment']
+  BUNDLE_WITHOUT = ENV['BUNDLE_WITHOUT'] || 'development:test'
+  bundler_args << '--without' << BUNDLE_WITHOUT unless BUNDLE_WITHOUT.empty?
+
+  # update gem bundle
+  run "bundle install #{bundler_args.join(' ')}"
+end
 
 if File.file? 'Rakefile'
   num_migrations = `git diff #{oldrev} #{newrev} --diff-filter=A --name-only`.split("\n").size
