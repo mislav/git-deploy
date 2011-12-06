@@ -19,7 +19,7 @@ if use_bundler
 end
 
 if File.file? 'Rakefile'
-  num_migrations = `git diff #{oldrev} #{newrev} --diff-filter=A --name-only`.split("\n").size
+  num_migrations = `git diff #{oldrev} #{newrev} --diff-filter=A --name-only -z db/migrate`.split("\0").size
   # run migrations if new ones have been added
   run "#{rake_cmd} db:migrate RAILS_ENV=#{RAILS_ENV}" if num_migrations > 0
 end
