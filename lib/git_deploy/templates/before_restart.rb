@@ -22,6 +22,7 @@ if File.file? 'Rakefile'
   num_migrations = `git diff #{oldrev} #{newrev} --diff-filter=A --name-only`.split("\n").size
   # run migrations if new ones have been added
   run "#{rake_cmd} db:migrate RAILS_ENV=#{RAILS_ENV}" if num_migrations > 0
+  run "#{rake_cmd} assets:precompile RAILS_ENV=#{RAILS_ENV}"
 end
 
 # clear cached assets (unversioned/ignored files)
