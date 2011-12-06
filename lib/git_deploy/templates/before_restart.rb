@@ -15,13 +15,18 @@ if use_bundler
   bundler_args << '--without' << BUNDLE_WITHOUT unless BUNDLE_WITHOUT.empty?
 
   # update gem bundle
-  run "bundle install #{bundler_args.join(' ')}"
+  gemfile_changed = `git diff #{oldrev} #{newrev} --name-only`.include?("Gemfile")
+  run "bundle install #{bundler_args.join(' ')}" if gemfile_changed
 end
 
 if File.file? 'Rakefile'
-  num_migrations = `git diff #{oldrev} #{newrev} --diff-filter=A --name-only`.split("\n").size
+  new_migration = `git diff #{oldrev} #{newrev} --diff-filter=A --name-only`.include?("migrate")
   # run migrations if new ones have been added
-  run "#{rake_cmd} db:migrate RAILS_ENV=#{RAILS_ENV}" if num_migrations > 0
+  run "#{rake_cmd} db:migrate RAILS_ENV=#{RAILS_ENV}" if new_migration
+
+  # run asset precompile
+  assets_changed = `git diff #{oldrev} #{newrev} --name-only`.include?("asset")
+  run "#{rake_cmd} assets:precompile RAILS_ENV=#{RAILS_ENV}" if assets_changed
 end
 
 # clear cached assets (unversioned/ignored files)
