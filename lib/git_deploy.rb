@@ -38,6 +38,7 @@ class GitDeploy < Thor
       cmd << "sed -i'' -e 's/master/#{branch}/' .git/HEAD" unless branch == 'master'
       cmd << "git config --bool receive.denyNonFastForwards false" if options.shared?
       cmd << "git config receive.denyCurrentBranch ignore"
+      cmd << "gem install bundler --no-rdoc --no-ri"
     end
 
     invoke :hooks
