@@ -64,8 +64,10 @@ class GitDeploy < Thor
   end
 
   desc "log [n=20]", "Shows the last part of the deploy log on the server"
+  method_option :tail, :aliases => '-t', :type => :boolean, :default => false
   def log(n = 20)
-    run "tail -n#{n} #{deploy_to}/log/deploy.log"
+    tail_args = options.tail? ? '-f' : "-n#{n}"
+    run "tail #{tail_args} #{deploy_to}/log/deploy.log"
   end
 
   desc "upload <files>", "Copy local files to the remote app"
