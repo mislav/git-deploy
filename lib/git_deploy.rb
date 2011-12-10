@@ -63,10 +63,11 @@ class GitDeploy < Thor
     invoke :restart
   end
 
-  desc "log [n=20]", "Shows the last part of the deploy log on the server"
+  desc "log", "Shows the last part of the deploy log on the server"
   method_option :tail, :aliases => '-t', :type => :boolean, :default => false
-  def log(n = 20)
-    tail_args = options.tail? ? '-f' : "-n#{n}"
+  method_option :lines, :aliases => '-l', :type => :numeric, :default => 20
+  def log(n = nil)
+    tail_args = options.tail? ? '-f' : "-n#{n || options.lines}"
     run "tail #{tail_args} #{deploy_to}/log/deploy.log"
   end
 
