@@ -12,6 +12,7 @@ class GitDeploy < Thor
 
   class_option :remote, :aliases => '-r', :type => :string, :default => 'origin'
   class_option :noop, :aliases => '-n', :type => :boolean, :default => false
+  class_option :env, :aliases => '-e', :type => :string, :default => 'production'
 
   desc "init", "Generates deployment customization scripts for your app"
   def init
@@ -48,7 +49,7 @@ class GitDeploy < Thor
   def hooks
     hooks_dir = File.join(LOCAL_DIR, 'hooks')
     remote_dir = "#{deploy_to}/.git/hooks"
-
+    system "sed -i'' -e 's/production/#{options[:env]}/' #{hooks_dir}/post-receive.sh" unless options[:env] == 'production'
     scp_upload "#{hooks_dir}/post-receive.sh" => "#{remote_dir}/post-receive"
     run "chmod +x #{remote_dir}/post-receive"
   end

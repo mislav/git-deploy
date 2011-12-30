@@ -25,6 +25,9 @@ done
 # abort if there's no update, or in case the branch is deleted
 [ -z "${newrev//0}" ] && exit
 
+export RAILS_ENV=production
+export RACK_ENV=production
+
 # check out the latest code into the working copy
 umask 002
 git reset --hard
