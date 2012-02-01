@@ -35,6 +35,8 @@ Setup steps
     
     This will initialize the remote git repository in the target directory ("/path/to/myapp" in the above example) and install the remote git hooks.
 
+    The target directory must already exists otherwise SCP will throw errors.
+
 3.  Run the init task:
     
         $ git deploy init
