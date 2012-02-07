@@ -44,12 +44,12 @@ if [ -z "${oldrev//0}" ]; then
   # init submodules
   git submodule update --recursive --init 2>&1 | tee -a $logfile
 
-  # execute the setup hook in background
-  [ -x deploy/setup ] && (nohup deploy/setup $newrev 1>>$logfile 2>>$logfile &)
+  # execute the one-time setup hook
+  [ -x deploy/setup ] && deploy/setup $oldrev $newrev 2>&1 | tee -a $logfile
 else
   # log timestamp
   echo ==== $(date) ==== >> $logfile
 
-  # execute the deploy hook in background
-  [ -x deploy/after_push ] && (nohup deploy/after_push $oldrev $newrev 1>>$logfile 2>>$logfile &)
+  # execute the main deploy hook
+  [ -x deploy/after_push ] && deploy/after_push $oldrev $newrev 2>&1 | tee -a $logfile
 fi
