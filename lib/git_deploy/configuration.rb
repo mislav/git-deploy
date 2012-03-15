@@ -1,28 +1,21 @@
+require 'uri'
+require 'cgi'
+require 'forwardable'
+
 class GitDeploy
   module Configuration
     private
 
-    def host
-      extract_host_and_user unless defined? @host
-      @host
-    end
+    extend Forwardable
+    def_delegator :remote_url, :host
+    def_delegator :remote_url, :port, :remote_port
+    def_delegator :remote_url, :path, :deploy_to
 
     def remote_user
-      extract_host_and_user unless defined? @user
-      @user
-    end
-
-    def extract_host_and_user
-      info = remote_url.split(':').first.split('@')
-      if info.size < 2
-        @user, @host = `whoami`.chomp, info.first
-      else
-        @user, @host = *info
+      @user ||= begin
+        user = remote_url.user
+        user ? CGI.unescape(user) : `whoami`.chomp
       end
-    end
-
-    def deploy_to
-      @deploy_to ||= remote_url.split(':').last
     end
 
     def branch
@@ -50,8 +43,15 @@ class GitDeploy
         url = remote_urls(remote).first
         if url.nil?
           abort "Error: Remote url not found for remote #{remote.inspect}"
-        elsif url =~ /\bgithub\.com\b/
+        elsif url =~ /(^|@)github\.com\b/
           abort "Error: Remote url for #{remote.inspect} points to GitHub. Can't deploy there!"
+        else
+          url = 'ssh://' + url.sub(%r{:/?}, '/') unless url =~ %r{^[\w-]+://}
+          begin
+            url = URI.parse url
+          rescue
+            abort "Error parsing remote url #{url}"
+          end
         end
         url
       end
