@@ -2,8 +2,7 @@
 if [ "$GIT_DIR" = "." ]; then
   # The script has been called as a hook; chdir to the working copy
   cd ..
-  GIT_DIR=.git
-  export GIT_DIR
+  unset GIT_DIR
 fi
 
 # try to obtain the usual system PATH
@@ -14,16 +13,17 @@ fi
 
 # get the current branch
 head="$(git symbolic-ref HEAD)"
-# abort if we're on a detached head
-[ "$?" != "0" ] && exit 1
 
 # read the STDIN to detect if this push changed the current branch
 while read oldrev newrev refname
 do
   [ "$refname" = "$head" ] && break
 done
+
 # abort if there's no update, or in case the branch is deleted
-[ -z "${newrev//0}" ] && exit
+if [ -z "${newrev//0}" ]; then
+  exit
+fi
 
 # check out the latest code into the working copy
 umask 002
