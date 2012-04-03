@@ -1,4 +1,4 @@
-#!/bin/bash -i
+#!/bin/bash
 set -e
 
 if [ "$GIT_DIR" = "." ]; then
