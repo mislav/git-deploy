@@ -1,7 +1,7 @@
 # encoding: utf-8
 Gem::Specification.new do |gem|
   gem.name    = 'osbro-git-deploy'
-  gem.version = '0.5.7'
+  gem.version = '0.5.9'
   gem.executables = %w[ git-deploy ]
   
   gem.add_dependency 'thor'
