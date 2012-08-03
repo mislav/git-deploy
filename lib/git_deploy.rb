@@ -49,7 +49,7 @@ class GitDeploy < Thor
   def hooks
     hooks_dir = File.join(LOCAL_DIR, 'hooks')
     remote_dir = "#{deploy_to}/.git/hooks"
-    system "sed -i'' -e 's/production/#{options[:env]}/' #{hooks_dir}/post-receive.sh" unless options[:env] == 'production'
+    # system "sed -i'' -e 's/production/#{options[:env]}/' #{hooks_dir}/post-receive.sh" unless options[:env] == 'production'
     scp_upload "#{hooks_dir}/post-receive.sh" => "#{remote_dir}/post-receive"
     run "chmod +x #{remote_dir}/post-receive"
   end
@@ -83,6 +83,12 @@ class GitDeploy < Thor
       all
     }
   end
+  
+  desc "checkout", "checkout a specific branch or tag of the site"
+  def checkout(ref)
+    run "cd #{deploy_to} && git checkout #{ref} && deploy/restart | tee -a log/deploy.log"
+  end
+  
 end
 
 __END__
