@@ -42,7 +42,7 @@ if [ -z "${oldrev//0}" ]; then
   chmod 0664 $logfile $restart
 
   # init submodules
-  git submodule update --init | tee -a $logfile
+  git submodule update --recursive --init | tee -a $logfile
 else
   # log timestamp
   echo ==== $(date) ==== >> $logfile
