@@ -48,5 +48,5 @@ else
   echo ==== $(date) ==== >> $logfile
 
   # execute the deploy hook in background
-  [ -x deploy/after_push ] && nohup deploy/after_push $oldrev $newrev 1>>$logfile 2>>$logfile &
+  [ -x deploy/after_push ] && (nohup deploy/after_push $oldrev $newrev 1>>$logfile 2>>$logfile &)
 fi
