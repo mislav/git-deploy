@@ -42,7 +42,7 @@ if [ -z "${oldrev//0}" ]; then
   chmod 0664 $logfile $restart
 
   # init submodules
-  git submodule update --recursive --init | tee -a $logfile
+  git submodule update --recursive --init 2>&1 | tee -a $logfile
 
   # execute the setup hook in background
   [ -x deploy/setup ] && (nohup deploy/setup $newrev 1>>$logfile 2>>$logfile &)
