@@ -55,7 +55,7 @@ class GitDeploy < Thor
   
   desc "restart", "Restarts the application on the server"
   def restart
-    run "cd #{deploy_to} && deploy/restart | tee -a log/deploy.log"
+    run "cd #{deploy_to} && deploy/restart 2>&1 | tee -a log/deploy.log"
   end
 
   desc "rollback", "Rolls back the checkout to before the last push"
