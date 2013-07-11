@@ -34,7 +34,9 @@ class GitDeploy
     end
 
     def remote_urls(remote)
-      git_config["config --get-all remote.#{remote}.url"].to_s.split("\n")
+      git_config["remote -v"].to_s.split("\n").
+        select {|l| l =~ /^#{remote}\t/ }.
+        map {|l| l.split("\t")[1].sub(/\(.+?\)$/, '') }
     end
 
     def remote_url(remote = options[:remote])
