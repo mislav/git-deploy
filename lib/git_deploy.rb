@@ -83,15 +83,3 @@ class GitDeploy < Thor
     }
   end
 end
-
-__END__
-Multiple hosts:
-# deploy:
-  invoke :code
-  command = ["cd #{deploy_to}"]
-  command << ".git/hooks/post-reset `cat .git/ORIG_HEAD` HEAD 2>&1 | tee -a log/deploy.log"
-
-# code:
-command = ["cd #{deploy_to}"]
-command << source.scm('fetch', remote, "+refs/heads/#{branch}:refs/remotes/origin/#{branch}")
-command << source.scm('reset', '--hard', "origin/#{branch}")
