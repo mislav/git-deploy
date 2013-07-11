@@ -14,6 +14,7 @@ Gem::Specification.new do |gem|
   gem.authors  = ['Mislav Marohnić']
   gem.email    = 'mislav.marohnic@gmail.com'
   gem.homepage = 'https://github.com/mislav/git-deploy'
+  gem.license  = 'MIT'
 
   gem.files = Dir['Rakefile', '{bin,lib,man,test,spec}/**/*', 'README*', 'LICENSE*']
 end
