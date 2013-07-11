@@ -20,7 +20,7 @@ class GitDeploy < Thor
   end
 
   desc "setup", "Create the remote git repository and install push hooks for it"
-  method_option :shared, :aliases => '-g', :type => :boolean, :default => true
+  method_option :shared, :aliases => '-g', :type => :boolean, :default => false
   method_option :sudo, :aliases => '-s', :type => :boolean, :default => false
   def setup
     sudo = options.sudo? ? "#{sudo_cmd} " : ''
