@@ -22,7 +22,7 @@ describe GitDeploy::Configuration do
   end
 
   def stub_remote_url(url, remote = options[:remote])
-    stub_git_config("config --get-all remote.#{remote}.url", url)
+    stub_git_config("config --get-regexp 'remote.#{remote}.(push)?url'", url)
   end
 
   describe "extracting user/host from remote url" do

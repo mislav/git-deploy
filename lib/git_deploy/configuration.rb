@@ -34,7 +34,9 @@ class GitDeploy
     end
 
     def remote_urls(remote)
-      git_config["config --get-all remote.#{remote}.url"].to_s.split("\n")
+      git_config["config --get-regexp 'remote.#{remote}.(push)?url'"].to_s.split("\n").map do |url|
+        url.split(" ").last
+      end
     end
 
     def remote_url(remote = options[:remote])
