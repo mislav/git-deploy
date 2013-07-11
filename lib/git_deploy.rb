@@ -71,12 +71,16 @@ class GitDeploy < Thor
 
   desc "rollback", "Rolls back the checkout to before the last push"
   def rollback
-    run "cd #{deploy_to} && git reset --hard ORIG_HEAD"
-    if run_test("test -x #{deploy_to}/deploy/rollback")
-      run "cd #{deploy_to} && deploy/rollback 2>&1 | tee -a log/deploy.log"
-    else
-      invoke :restart
-    end
+    run <<-BASH, :echo => false
+      bash -e -c '
+        cd '#{deploy_to}'
+        declare -a revs=( $(git rev-parse HEAD HEAD@{1}) )
+        git reset --hard ${revs[1]}
+        callback=after_push
+        [ -x deploy/rollback ] && callback=rollback
+        deploy/$callback ${revs[@]} 2>&1 | tee -a log/deploy.log
+      '
+    BASH
   end
 
   desc "log", "Shows the last part of the deploy log on the server"
