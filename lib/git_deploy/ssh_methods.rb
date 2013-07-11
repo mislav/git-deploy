@@ -11,10 +11,13 @@ class GitDeploy
       super unless options.noop?
     end
 
-    def run(cmd = nil)
+    def run(cmd = nil, opt = {})
       cmd = yield(cmd) if block_given?
       cmd = cmd.join(' && ') if Array === cmd
-      puts "[#{options[:remote]}] $ " + cmd.gsub(' && ', " && \\\n  ")
+
+      if opt.fetch(:echo, true)
+        puts "[#{options[:remote]}] $ " + cmd.gsub(' && ', " && \\\n  ")
+      end
 
       unless options.noop?
         status, output = ssh_exec cmd do |ch, stream, data|

@@ -58,6 +58,17 @@ class GitDeploy < Thor
     run "cd #{deploy_to} && deploy/restart 2>&1 | tee -a log/deploy.log"
   end
 
+  desc "rerun", "Runs the `deploy/after_push' callback as if a new revision was pushed via git"
+  def rerun
+    run <<-BASH, :echo => false
+      bash -e -c '
+        cd '#{deploy_to}'
+        declare -a revs=( $(git rev-parse HEAD@{1} HEAD) )
+        deploy/after_push ${revs[@]} 2>&1 | tee -a log/deploy.log
+      '
+    BASH
+  end
+
   desc "rollback", "Rolls back the checkout to before the last push"
   def rollback
     run "cd #{deploy_to} && git reset --hard ORIG_HEAD"
