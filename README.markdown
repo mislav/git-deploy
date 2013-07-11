@@ -110,7 +110,5 @@ All of the callbacks are optional. These scripts are ordinary Unix executables.
 The ones which get generated for you by `git deploy init` are written in shell
 script and Ruby.
 
-It's worth remembering that "after_push" is done **asynchronously from your git push**. This is because migrating the database and updating submodules might take a long time and you don't want to wait for all that during a git push. But, this means that when the push is done, the server has *not yet restarted*. You might need to wait a few seconds or a minute.
-
 
   [heroku]: http://heroku.com/
