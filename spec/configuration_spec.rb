@@ -1,4 +1,4 @@
-require 'rspec'
+require 'rspec/autorun'
 require 'git_deploy/configuration'
 
 describe GitDeploy::Configuration do
