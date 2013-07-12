@@ -101,14 +101,34 @@ repository. This is how your code on the server is kept up to date. This script
 checks out the latest version of your project from the current branch and
 runs the following callback scripts:
 
+* `deploy/setup` - on first push.
 * `deploy/after_push` - on subsequent pushes. It in turn executes:
   * `deploy/before_restart`
   * `deploy/restart`
   * `deploy/after_restart`
+* `deploy/rollback` - executed for `git deploy rollback`.
 
 All of the callbacks are optional. These scripts are ordinary Unix executables.
 The ones which get generated for you by `git deploy init` are written in shell
 script and Ruby.
+
+
+Extra commands
+--------------
+
+* `git deploy hooks` - Updates git hooks on the remote repository
+
+* `git deploy log [N=20]` - Shows last 20 lines of deploy log on the server
+
+* `git deploy rerun` - Re-runs the `deploy/after_push` callback as if a git push happened
+
+* `git deploy restart` - Runs the `deploy/restart` callback
+
+* `git deploy rollback` - Undo a deploy by checking out the previous revision,
+  runs `deploy/callback` if exists instead of `deploy/after_push`
+
+* `git deploy upload <files>` - Copy local files to the remote app
+
 
 
   [heroku]: http://heroku.com/
