@@ -49,6 +49,7 @@ class GitDeploy
           abort "Error: Remote url for #{remote.inspect} points to GitHub. Can't deploy there!"
         else
           url = 'ssh://' + url.sub(%r{:/?}, '/') unless url =~ %r{^[\w-]+://}
+          url.strip!
           begin
             url = URI.parse url
           rescue
