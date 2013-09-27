@@ -125,7 +125,7 @@ Extra commands
 * `git deploy restart` - Runs the `deploy/restart` callback
 
 * `git deploy rollback` - Undo a deploy by checking out the previous revision,
-  runs `deploy/callback` if exists instead of `deploy/after_push`
+  runs `deploy/rollback` if exists instead of `deploy/after_push`
 
 * `git deploy upload <files>` - Copy local files to the remote app
 
