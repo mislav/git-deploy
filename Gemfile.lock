@@ -28,4 +28,4 @@ PLATFORMS
 
 DEPENDENCIES
   git-deploy!
-  rspec
+  rspec (~> 2.13.0)
