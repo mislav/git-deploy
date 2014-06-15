@@ -21,9 +21,11 @@ end
 if File.file? 'Rakefile'
   tasks = []
 
-  num_migrations = `git diff #{oldrev} #{newrev} --diff-filter=A --name-only -z db/migrate`.split("\0").size
-  # run migrations if new ones have been added
-  tasks << "db:migrate" if num_migrations > 0
+  if File.directory? 'db/migrate'
+    num_migrations = `git diff #{oldrev} #{newrev} --diff-filter=A --name-only -z db/migrate`.split("\0").size
+    # run migrations if new ones have been added
+    tasks << "db:migrate" if num_migrations > 0
+  end
 
   # precompile assets
   changed_assets = `git diff #{oldrev} #{newrev} --name-only -z app/assets`.split("\0")
