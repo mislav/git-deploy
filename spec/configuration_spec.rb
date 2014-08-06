@@ -43,6 +43,17 @@ describe GitDeploy::Configuration do
       its(:remote_user) { should eq('git') }
       its(:deploy_to)   { should eq('/path/to/app') }
     end
+
+    context "pushurl only" do
+      before {
+        remote = options.fetch(:remote)
+        url = 'git@example.com:/path/to/app'
+        stub_git_config("remote -v", "#{remote}\t\n#{remote}\t#{url} (push)")
+      }
+
+      its(:host)        { should eq('example.com') }
+      its(:remote_user) { should eq('git') }
+    end
   end
 
 end
