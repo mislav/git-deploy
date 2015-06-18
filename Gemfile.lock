@@ -1,18 +1,18 @@
 PATH
   remote: .
   specs:
-    git-deploy (0.6.0)
-      net-scp (~> 1.1.0)
-      net-ssh (~> 2.6.6)
+    git-deploy (0.6.1)
+      net-scp (~> 1.1)
+      net-ssh (~> 2.6)
       thor (= 0.14.6)
 
 GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.2.4)
-    net-scp (1.1.2)
+    net-scp (1.2.1)
       net-ssh (>= 2.6.5)
-    net-ssh (2.6.8)
+    net-ssh (2.9.1)
     rspec (2.13.0)
       rspec-core (~> 2.13.0)
       rspec-expectations (~> 2.13.0)
@@ -29,3 +29,6 @@ PLATFORMS
 DEPENDENCIES
   git-deploy!
   rspec (~> 2.13.0)
+
+BUNDLED WITH
+   1.10.3
