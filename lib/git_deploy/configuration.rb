@@ -9,7 +9,16 @@ class GitDeploy
     extend Forwardable
     def_delegator :remote_url, :host
     def_delegator :remote_url, :port, :remote_port
-    def_delegator :remote_url, :path, :deploy_to
+
+    def deploy_to
+      @deploy_to ||= begin
+        if remote_url.path.start_with? '/~/'
+          remote_url.path[1..-1]
+        else
+          remote_url.path 
+        end
+      end
+    end
 
     def remote_user
       @user ||= begin
