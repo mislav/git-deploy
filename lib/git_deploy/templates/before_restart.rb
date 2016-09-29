@@ -21,7 +21,12 @@ end
 if File.file? 'Rakefile'
   tasks = []
 
-  num_migrations = `git diff #{oldrev} #{newrev} --diff-filter=A --name-only -z -- db/migrate`.split("\0").size
+  if File.exist?('db/migrate')
+    num_migrations = `git diff #{oldrev} #{newrev} --diff-filter=A --name-only -z -- db/migrate`.split("\0").size
+  else
+    num_migrations = 0
+  end
+
   # run migrations if new ones have been added
   tasks << "db:migrate" if num_migrations > 0
 
