@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+for group in `groups`; do
+  if [ "${group}" = "rvm" ] && [ -f "/etc/profile.d/rvm.sh" ]; then 
+    source /etc/profile.d/rvm.sh
+  fi
+done
+
 if [ "$GIT_DIR" = "." ]; then
   # The script has been called as a hook; chdir to the working copy
   cd ..
