@@ -38,7 +38,7 @@ Initial setup
 2.  Run the setup task:
 
     ```sh
-    git deploy setup -r "production"
+    git-deploy setup -r "production"
     ```
 
     This will initialize the remote git repository in the deploy directory
@@ -47,7 +47,7 @@ Initial setup
 3.  Run the init task:
 
     ```sh
-    git deploy init
+    git-deploy init
     ```
 
     This generates default deploy callback scripts in the `deploy/` directory.
