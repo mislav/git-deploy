@@ -5,7 +5,7 @@ Gem::Specification.new do |gem|
   gem.executables = %w[ git-deploy ]
 
   gem.add_dependency 'thor', '0.14.6'
-  gem.add_dependency 'net-ssh', '~> 2.6'
+  gem.add_dependency 'net-ssh', '~> 5.0'
   gem.add_dependency 'net-scp', '~> 1.1'
 
   gem.summary = "Simple git push-based application deployment"
