@@ -93,7 +93,7 @@ class GitDeploy
 
     def ssh_connection
       @ssh ||= begin
-        ssh = Net::SSH.start(host, remote_user, :port => remote_port)
+        ssh = Net::SSH.start(host, remote_user, :port => remote_port || 22)
         at_exit { ssh.close }
         ssh
       end
