@@ -44,6 +44,15 @@ describe GitDeploy::Configuration do
       its(:deploy_to)   { should eq('/path/to/app') }
     end
 
+    context "scp-style with home" do
+      before { stub_remote_url 'git@example.com:~/path/to/app' }
+
+      its(:host)        { should eq('example.com') }
+      its(:remote_port) { should be_nil }
+      its(:remote_user) { should eq('git') }
+      its(:deploy_to)   { should eq('~/path/to/app') }
+    end
+
     context "pushurl only" do
       before {
         remote = options.fetch(:remote)

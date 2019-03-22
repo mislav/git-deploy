@@ -1,3 +1,4 @@
+sudo: false
 bundler_args: "--without development"
 script: bundle exec rspec
 rvm:
